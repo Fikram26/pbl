@@ -283,7 +283,6 @@
                         <th>Status</th>
                         <th>Pembayaran</th>
                         <th>Created At</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -304,24 +303,10 @@
                             </span>
                         </td>
                         <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{{ route('user.orders.edit', $order->id) }}" class="edit-button">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('user.orders.destroy', $order->id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this order?')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" style="text-align: center;">No orders found</td>
+                        <td colspan="6" style="text-align: center;">No orders found</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -329,4 +314,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>
