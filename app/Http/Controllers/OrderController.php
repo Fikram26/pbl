@@ -106,6 +106,7 @@ class OrderController extends Controller
         $order->update([
             'status' => 'sedang dikerjakan',
             'started_at' => now(),
+            'timer_duration' => $order->timer_duration ?? 60,
         ]);
         return redirect()->route('admin.timer')->with('success', 'Order launched successfully!');
     }

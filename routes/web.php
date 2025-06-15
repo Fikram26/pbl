@@ -59,6 +59,32 @@ Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\
         return view('admin.settings', compact('laundrySettings'));
     })->name('settings');
 
+    Route::get('/settings/{setting}/edit', function ($setting) {
+        $setting = \App\Models\LaundrySetting::findOrFail($setting);
+        return response()->json($setting);
+    })->name('settings.edit');
+
+    Route::put('/settings/{setting}', function ($setting) {
+        $setting = \App\Models\LaundrySetting::findOrFail($setting);
+        
+        $validated = request()->validate([
+            'jenis_pakaian' => 'required|string|max:255',
+            'bahan' => 'required|string|max:255',
+            'timer_minutes' => 'required|integer|min:1',
+        ]);
+
+        $setting->update($validated);
+
+        return redirect()->route('admin.settings')
+            ->with('success', 'Setting updated successfully');
+    })->name('settings.update');
+
+    Route::delete('/settings/{setting}', function ($setting) {
+        \App\Models\LaundrySetting::findOrFail($setting)->delete();
+        return redirect()->route('admin.settings')
+            ->with('success', 'Setting deleted successfully');
+    })->name('settings.destroy');
+
     // User Management Routes
     Route::get('/user', function () {
         $query = \App\Models\Login::query();
@@ -148,10 +174,8 @@ Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\
 
     // Work Management Route
     Route::get('/timer', function () {
-        $activeOrders = \App\Models\Order::where('status', 'in_progress')->get();
-        $pendingOrders = \App\Models\Order::where('status', 'pending')->get();
-        $completedOrders = \App\Models\Order::where('status', 'completed')->get();
-        return view('admin.timer', compact('activeOrders', 'pendingOrders', 'completedOrders'));
+        $activeOrders = \App\Models\Order::where('status', 'sedang dikerjakan')->orderByDesc('started_at')->get();
+        return view('admin.timer', compact('activeOrders'));
     })->name('timer');
 
     // Laundry Settings Routes
@@ -167,32 +191,6 @@ Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\
         return redirect()->route('admin.settings')
             ->with('success', 'Setting added successfully');
     })->name('settings.store');
-
-    Route::get('/settings/{setting}/edit', function ($setting) {
-        $setting = \App\Models\LaundrySetting::findOrFail($setting);
-        return response()->json($setting);
-    })->name('settings.edit');
-
-    Route::put('/settings/{setting}', function ($setting) {
-        $setting = \App\Models\LaundrySetting::findOrFail($setting);
-        
-        $validated = request()->validate([
-            'jenis_pakaian' => 'required|string|max:255',
-            'bahan' => 'required|string|max:255',
-            'timer_minutes' => 'required|integer|min:1',
-        ]);
-
-        $setting->update($validated);
-
-        return redirect()->route('admin.settings')
-            ->with('success', 'Setting updated successfully');
-    })->name('settings.update');
-
-    Route::delete('/settings/{setting}', function ($setting) {
-        \App\Models\LaundrySetting::findOrFail($setting)->delete();
-        return redirect()->route('admin.settings')
-            ->with('success', 'Setting deleted successfully');
-    })->name('settings.destroy');
 
     // Profile Management Routes
     Route::put('/profile', function () {
@@ -267,11 +265,11 @@ Route::prefix('user')->name('user.')->group(function () {
             'bahan_pakaian' => 'required|string',
             'banyak' => 'required|integer|min:1',
             'timer_duration' => 'required|integer|min:1',
+            'payment_status' => 'required|in:belum_lunas,lunas',
         ]);
 
         $validated['account_id'] = session('login_id');
         $validated['status'] = 'belum selesai';
-        $validated['payment_status'] = 'belum_lunas';
 
         \App\Models\Order::create($validated);
 

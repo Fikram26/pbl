@@ -195,8 +195,16 @@
                 <span>Orders</span>
             </a>
             <a href="{{ route('admin.user') }}" class="nav-item">
-                <i class="fas fa-users"></i>
-                <span>Users</span>
+                <i class="fas fa-user"></i>
+                <span>User</span>
+            </a>
+            <a href="{{ route('admin.timer') }}" class="nav-item">
+                <i class="fas fa-clock"></i>
+                <span>Timer</span>
+            </a>
+            <a href="{{ route('admin.about') }}" class="nav-item">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
             </a>
             <a href="{{ route('admin.settings') }}" class="nav-item">
                 <i class="fas fa-cog"></i>

@@ -239,6 +239,22 @@
                 width: 100%;
             }
         }
+
+        .table th, .table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+        }
+        .table tr {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .table tbody tr:not(:last-child) {
+            margin-bottom: 0.5rem;
+        }
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+            background: white;
+        }
     </style>
 </head>
 <body>
@@ -294,129 +310,102 @@
             </h1>
         </div>
 
-        <!-- Active Orders Section -->
+        <!-- Timer Orders Table -->
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">Active Orders</h2>
+                <h2 class="card-title">Timer Orderan</h2>
             </div>
             <div class="card-body">
-                @forelse($activeOrders as $order)
-                    <div class="timer-item">
-                        <div class="timer-item-header">
-                            <h3 class="timer-item-title">Order ID: #{{ $order->id }}</h3>
-                            <span class="status-badge status-progress">
-                                {{ $order->status }}
-                            </span>
-                        </div>
-                        <div class="timer-item-details">
-                            <div><strong>Jenis Pakaian:</strong> {{ $order->jenis_pakaian }}</div>
-                            <div><strong>Bahan:</strong> {{ $order->bahan_pakaian }}</div>
-                            <div><strong>Banyak:</strong> {{ $order->banyak }}</div>
-                            <div class="timer-display" id="timer-{{ $order->id }}" data-start-time="{{ $order->updated_at->timestamp }}" data-duration="{{ $order->timer_duration * 60 }}">
-                                Calculating...
-                            </div>
-                        </div>
-                        <div class="timer-item-actions">
-                            {{-- Add any action buttons here if needed, e.g., view order --}}
-                        </div>
-                    </div>
-                @empty
-                    <p>No active orders at the moment.</p>
-                @endforelse
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID Order</th>
+                            <th>Jenis Pakaian</th>
+                            <th>Bahan</th>
+                            <th>Jumlah</th>
+                            <th>Timer</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($activeOrders as $order)
+                        <tr>
+                            <td>{{ $order->id }}</td>
+                            <td>{{ $order->jenis_pakaian }}</td>
+                            <td>{{ $order->bahan_pakaian }}</td>
+                            <td>{{ $order->banyak }}</td>
+                            <td>
+                                <div class="order-timer" data-started-at="{{ $order->started_at ? $order->started_at->timestamp : 0 }}" data-duration="{{ $order->timer_duration * 60 }}">
+                                    --:--:--
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge status-progress">{{ $order->status }}</span>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" style="text-align:center;">Tidak ada order yang sedang dikerjakan</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        </div>
-
-        <!-- Pending Orders Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Pending Orders</h2>
-            </div>
-            @forelse($pendingOrders as $order)
-            <div class="timer-item">
-                <div class="timer-item-header">
-                    <h3 class="timer-item-title">Order #{{ $order->id }}</h3>
-                    <span class="status-badge status-pending">Pending</span>
-                </div>
-                <div class="timer-item-details">
-                    <div>Customer: {{ $order->account->name }}</div>
-                    <div>Jenis Pakaian: {{ $order->jenis_pakaian }}</div>
-                    <div>Bahan: {{ $order->bahan_pakaian }}</div>
-                    <div>Banyak: {{ $order->banyak }}</div>
-                </div>
-                <div class="timer-item-actions">
-                    <form action="{{ route('admin.orders.launch', $order->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-play"></i>
-                            Start
-                        </button>
-                    </form>
-                </div>
-            </div>
-            @empty
-            <p>No pending orders at the moment.</p>
-            @endforelse
-        </div>
-
-        <!-- Completed Orders Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">Completed Orders</h2>
-            </div>
-            @forelse($completedOrders as $order)
-            <div class="timer-item">
-                <div class="timer-item-header">
-                    <h3 class="timer-item-title">Order #{{ $order->id }}</h3>
-                    <span class="status-badge status-completed">Completed</span>
-                </div>
-                <div class="timer-item-details">
-                    <div>Customer: {{ $order->account->name }}</div>
-                    <div>Jenis Pakaian: {{ $order->jenis_pakaian }}</div>
-                    <div>Bahan: {{ $order->bahan_pakaian }}</div>
-                    <div>Banyak: {{ $order->banyak }}</div>
-                    <div>Completed: {{ $order->updated_at->format('M d, Y H:i') }}</div>
-                </div>
-            </div>
-            @empty
-            <p>No completed orders at the moment.</p>
-            @endforelse
         </div>
     </div>
 
     <script>
-        function updateTimers() {
-            const timers = document.querySelectorAll('[id^="timer-"]');
-            const now = Math.floor(Date.now() / 1000);
-
-            timers.forEach(timer => {
-                const startTime = parseInt(timer.dataset.startTime);
-                const duration = parseInt(timer.dataset.duration || 300); // Use actual duration or fallback to 5 minutes
-                const elapsedSeconds = now - startTime;
-                const remainingSeconds = duration - elapsedSeconds;
-
-                if (remainingSeconds > 0) {
-                    const hours = Math.floor(remainingSeconds / 3600);
-                    const minutes = Math.floor((remainingSeconds % 3600) / 60);
-                    const seconds = remainingSeconds % 60;
-
-                    let formattedTime;
-                    if (hours > 0) {
-                        formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        function updateOrderTimers() {
+            document.querySelectorAll('.order-timer').forEach(timerElement => {
+                const startedAtTimestamp = parseInt(timerElement.dataset.startedAt);
+                const duration = parseInt(timerElement.dataset.duration);
+                const row = timerElement.closest('tr');
+                const statusCell = row.querySelector('td:last-child .status-badge');
+                if (startedAtTimestamp > 0) {
+                    const nowTimestamp = Math.floor(Date.now() / 1000);
+                    const elapsedSeconds = nowTimestamp - startedAtTimestamp;
+                    const remainingSeconds = duration - elapsedSeconds;
+                    if (remainingSeconds <= 0) {
+                        timerElement.textContent = '00:00:00';
+                        timerElement.classList.add('danger');
+                        // Update status di database hanya sekali
+                        if (!timerElement.dataset.completed) {
+                            timerElement.dataset.completed = 'true';
+                            const orderId = row.querySelector('td').textContent.trim();
+                            fetch(`/admin/orders/${orderId}/complete`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Content-Type': 'application/json'
+                                }
+                            }).then(() => {
+                                // Update status di tabel tanpa reload
+                                if (statusCell) {
+                                    statusCell.textContent = 'selesai';
+                                    statusCell.classList.remove('status-progress');
+                                    statusCell.classList.add('status-completed');
+                                }
+                            });
+                        }
                     } else {
-                        formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        const hours = Math.floor(remainingSeconds / 3600);
+                        const minutes = Math.floor((remainingSeconds % 3600) / 60);
+                        const seconds = remainingSeconds % 60;
+                        let formattedTime;
+                        if (hours > 0) {
+                            formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        } else {
+                            formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        }
+                        timerElement.textContent = formattedTime;
                     }
-
-                    timer.textContent = formattedTime;
                 } else {
-                    timer.textContent = "Time's up!";
+                    timerElement.textContent = '--:--:--';
                 }
             });
         }
-
-        // Update timers every second
-        setInterval(updateTimers, 1000);
-        // Initial update
-        updateTimers();
+        setInterval(updateOrderTimers, 1000);
+        updateOrderTimers();
     </script>
 </body>
 </html> 

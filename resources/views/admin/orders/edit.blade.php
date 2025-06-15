@@ -168,7 +168,7 @@
             <i class="fas fa-hanger"></i>
             <span>The Third Interprenuer</span>
         </div>
-
+        
         <div class="nav-menu">
             <p class="menu-title">Menu</p>
             <a href="{{ route('admin.dashboard') }}" class="nav-item">
@@ -195,6 +195,13 @@
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
+            <form action="{{ route('logout') }}" method="POST" style="margin-top: 2rem;">
+                @csrf
+                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </div>
 

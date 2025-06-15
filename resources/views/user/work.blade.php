@@ -418,6 +418,25 @@
 
                 if (remainingSeconds <= 0) {
                     timerElement.textContent = '00:00:00';
+                    timerElement.classList.add('danger');
+                    
+                    // Update status order ke selesai
+                    const orderId = timerElement.closest('.work-item').querySelector('h4').textContent.replace('Order #', '');
+                    if (!timerElement.dataset.completed) {
+                        timerElement.dataset.completed = 'true';
+                        fetch(`/admin/orders/${orderId}/complete`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(() => {
+                            // Reload halaman setelah status diupdate
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        });
+                    }
                 } else {
                     const hours = Math.floor(remainingSeconds / 3600);
                     const minutes = Math.floor((remainingSeconds % 3600) / 60);

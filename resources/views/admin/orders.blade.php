@@ -435,7 +435,7 @@
                         timerElement.textContent = '00:00:00';
                         timerElement.classList.add('danger');
                         
-                        // Show completion notification
+                        // Show completion notification only once
                         if (!timerElement.dataset.notified) {
                             timerElement.dataset.notified = 'true';
                             const orderId = timerElement.closest('tr').querySelector('td:first-child').textContent;
@@ -472,10 +472,19 @@
                                 setTimeout(() => notification.remove(), 500);
                             }, 5000);
 
-                            // Reload the page after a short delay
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
+                            // Update status order ke selesai
+                            fetch(`/admin/orders/${orderId}/complete`, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Content-Type': 'application/json'
+                                }
+                            }).then(() => {
+                                // Reload halaman setelah status diupdate
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1000);
+                            });
                         }
                     } else {
                         // Add warning class when less than 1 minute remaining
@@ -498,6 +507,8 @@
 
                         timerElement.textContent = formattedTime;
                     }
+                } else {
+                    timerElement.textContent = '--:--:--';
                 }
             });
         }
@@ -519,31 +530,6 @@
         // Update timers immediately and then every second
         updateOrderTimers();
         setInterval(updateOrderTimers, 1000);
-
-        function updateTimers() {
-            const timers = document.querySelectorAll('[id^="timer-"]');
-            const now = Math.floor(Date.now() / 1000);
-
-            timers.forEach(timer => {
-                const startTime = parseInt(timer.dataset.startTime);
-                const duration = parseInt(timer.dataset.duration || 300); // Use actual duration or fallback to 5 minutes
-                const elapsedSeconds = now - startTime;
-                const remainingSeconds = duration - elapsedSeconds;
-
-                if (remainingSeconds > 0) {
-                    const minutes = Math.floor(remainingSeconds / 60);
-                    const seconds = remainingSeconds % 60;
-                    timer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                } else {
-                    timer.textContent = "Time's up!";
-                }
-            });
-        }
-
-        // Update timers every second
-        setInterval(updateTimers, 1000);
-        // Initial update
-        updateTimers();
     </script>
 </body>
 </html> 

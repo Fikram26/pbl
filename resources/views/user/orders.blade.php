@@ -374,6 +374,21 @@
                     if (remainingSeconds <= 0) {
                         timerElement.textContent = '00:00:00';
                         timerElement.classList.add('danger');
+                        
+                        // Update status order ke selesai
+                        const orderId = timerElement.closest('tr').querySelector('td:first-child').textContent.replace('#', '');
+                        fetch(`/admin/orders/${orderId}/complete`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(() => {
+                            // Reload halaman setelah status diupdate
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        });
                     } else {
                         // Add warning class when less than 1 minute remaining
                         if (remainingSeconds <= 60) {
