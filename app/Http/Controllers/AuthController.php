@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Login;
+use App\Models\LoginHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -23,9 +24,16 @@ class AuthController extends Controller
         $user = Login::where('email', $request->email)->first();
         
         if ($user && Hash::check($request->password, $user->password)) {
-            // Update last login
+            // Update last login details on the user model
             $user->update([
                 'last_login_at' => now(),
+                'ip_address' => $request->ip()
+            ]);
+
+            // Record login history
+            LoginHistory::create([
+                'user_id' => $user->id,
+                'login_at' => now(),
                 'ip_address' => $request->ip()
             ]);
             

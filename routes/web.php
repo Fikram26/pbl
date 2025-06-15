@@ -61,7 +61,18 @@ Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\
 
     // User Management Routes
     Route::get('/user', function () {
-        $users = \App\Models\Login::all();
+        $query = \App\Models\Login::query();
+
+        if (request('search')) {
+            $searchTerm = request('search');
+            $query->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('phone', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('address', 'like', '%' . $searchTerm . '%');
+        }
+
+        $users = $query->latest()->get();
+
         return view('admin.user', compact('users'));
     })->name('user');
 
@@ -69,26 +80,26 @@ Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\
         return view('admin.user.create');
     })->name('user.create');
 
-    Route::post('/user', function (\Illuminate\Http\Request $request) {
-        $validated = $request->validate([
+    Route::post('/user', function () {
+        $validated = request()->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:logins',
+            'email' => 'required|string|email|max:255|unique:logins,email',
             'password' => 'required|string|min:8',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string',
-            'role' => 'required|in:admin,user'
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'role' => 'required|in:admin,user',
         ]);
 
-        $user = \App\Models\Login::create([
+        \App\Models\Login::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
-            'phone' => $validated['phone'],
-            'address' => $validated['address'],
-            'role' => $validated['role']
+            'password' => Hash::make($validated['password']),
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'role' => $validated['role'],
         ]);
 
-        return redirect()->route('admin.user')->with('success', 'User created successfully');
+        return redirect()->route('admin.user')->with('success', 'User created successfully!');
     })->name('user.store');
 
     Route::get('/user/{id}/edit', function ($id) {
@@ -259,7 +270,8 @@ Route::prefix('user')->name('user.')->group(function () {
         ]);
 
         $validated['account_id'] = session('login_id');
-        $validated['status'] = 'pending';
+        $validated['status'] = 'belum selesai';
+        $validated['payment_status'] = 'belum_lunas';
 
         \App\Models\Order::create($validated);
 
@@ -301,7 +313,8 @@ Route::prefix('user')->name('user.')->group(function () {
     // Settings
     Route::get('/settings', function () {
         $user = \App\Models\Login::find(session('login_id'));
-        return view('user.settings', compact('user'));
+        $loginHistory = $user->logins()->latest()->take(10)->get();
+        return view('user.settings', compact('user', 'loginHistory'));
     })->name('settings');
 
     // Profile Update

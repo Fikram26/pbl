@@ -245,7 +245,7 @@
 
                     <div class="mb-3">
                         <label for="timer_duration" class="form-label">Durasi Timer (menit)</label>
-                        <input type="number" name="timer_duration" id="timer_duration" class="form-control" value="{{ old('timer_duration', $order->timer_duration ?? 5) }}" min="1" required>
+                        <input type="number" name="timer_duration" id="timer_duration" class="form-control" value="{{ old('timer_duration', $order->timer_duration) }}" min="1" required>
                         <small class="form-text text-muted">Waktu yang dibutuhkan untuk menyelesaikan order (dalam menit)</small>
                     </div>
 

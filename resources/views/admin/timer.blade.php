@@ -124,6 +124,13 @@
             font-family: monospace;
         }
 
+        .timer-display {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e40af;
+            margin-top: 0.25rem;
+        }
+
         /* Status Badge Styles */
         .status-badge {
             padding: 0.5rem 1rem;
@@ -256,10 +263,6 @@
                 <i class="fas fa-user"></i>
                 <span>User</span>
             </a>
-            <a href="{{ route('admin.settings') }}" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
             <a href="{{ route('admin.timer') }}" class="nav-item">
                 <i class="fas fa-clock"></i>
                 <span>Timer</span>
@@ -267,6 +270,10 @@
             <a href="{{ route('admin.about') }}" class="nav-item">
                 <i class="fas fa-info-circle"></i>
                 <span>About</span>
+            </a>
+            <a href="{{ route('admin.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
             </a>
             <form action="{{ route('logout') }}" method="POST" style="margin-top: 2rem;">
                 @csrf
@@ -292,35 +299,31 @@
             <div class="card-header">
                 <h2 class="card-title">Active Orders</h2>
             </div>
-            @forelse($activeOrders as $order)
-            <div class="timer-item">
-                <div class="timer-item-header">
-                    <h3 class="timer-item-title">Order #{{ $order->id }}</h3>
-                    <span class="status-badge status-progress">In Progress</span>
-                </div>
-                <div class="timer-item-details">
-                    <div>Customer: {{ $order->account->name }}</div>
-                    <div>Jenis Pakaian: {{ $order->jenis_pakaian }}</div>
-                    <div>Bahan: {{ $order->bahan_pakaian }}</div>
-                    <div>Banyak: {{ $order->banyak }}</div>
-                    <div>Started: {{ $order->started_at->format('M d, Y H:i') }}</div>
-                    <div class="timer" id="timer-{{ $order->id }}" data-duration="{{ $order->timer_duration }}" data-start="{{ $order->started_at->timestamp }}">
-                        Loading...
+            <div class="card-body">
+                @forelse($activeOrders as $order)
+                    <div class="timer-item">
+                        <div class="timer-item-header">
+                            <h3 class="timer-item-title">Order ID: #{{ $order->id }}</h3>
+                            <span class="status-badge status-progress">
+                                {{ $order->status }}
+                            </span>
+                        </div>
+                        <div class="timer-item-details">
+                            <div><strong>Jenis Pakaian:</strong> {{ $order->jenis_pakaian }}</div>
+                            <div><strong>Bahan:</strong> {{ $order->bahan_pakaian }}</div>
+                            <div><strong>Banyak:</strong> {{ $order->banyak }}</div>
+                            <div class="timer-display" id="timer-{{ $order->id }}" data-start-time="{{ $order->updated_at->timestamp }}" data-duration="{{ $order->timer_duration * 60 }}">
+                                Calculating...
+                            </div>
+                        </div>
+                        <div class="timer-item-actions">
+                            {{-- Add any action buttons here if needed, e.g., view order --}}
+                        </div>
                     </div>
-                </div>
-                <div class="timer-item-actions">
-                    <form action="{{ route('admin.orders.complete-timer', $order->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check"></i>
-                            Complete
-                        </button>
-                    </form>
-                </div>
+                @empty
+                    <p>No active orders at the moment.</p>
+                @endforelse
             </div>
-            @empty
-            <p>No active orders at the moment.</p>
-            @endforelse
         </div>
 
         <!-- Pending Orders Section -->
@@ -381,39 +384,39 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Timer functionality for active orders
-            @foreach($activeOrders as $order)
-            (function() {
-                const timerElement = document.getElementById('timer-{{ $order->id }}');
-                const duration = {{ $order->timer_duration }} * 60; // Convert to seconds
-                const startTime = new Date('{{ $order->started_at }}').getTime();
-                
-                function updateTimer() {
-                    const now = new Date().getTime();
-                    const elapsed = Math.floor((now - startTime) / 1000);
-                    const remaining = Math.max(0, duration - elapsed);
-                    
-                    const minutes = Math.floor(remaining / 60);
-                    const seconds = remaining % 60;
-                    
-                    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                    
-                    if (remaining > 0) {
-                        setTimeout(updateTimer, 1000);
+        function updateTimers() {
+            const timers = document.querySelectorAll('[id^="timer-"]');
+            const now = Math.floor(Date.now() / 1000);
+
+            timers.forEach(timer => {
+                const startTime = parseInt(timer.dataset.startTime);
+                const duration = parseInt(timer.dataset.duration || 300); // Use actual duration or fallback to 5 minutes
+                const elapsedSeconds = now - startTime;
+                const remainingSeconds = duration - elapsedSeconds;
+
+                if (remainingSeconds > 0) {
+                    const hours = Math.floor(remainingSeconds / 3600);
+                    const minutes = Math.floor((remainingSeconds % 3600) / 60);
+                    const seconds = remainingSeconds % 60;
+
+                    let formattedTime;
+                    if (hours > 0) {
+                        formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                     } else {
-                        timerElement.textContent = "00:00";
-                        timerElement.style.color = "#ef4444";
-                        // Optional: Auto-complete the order when timer reaches zero
-                        // document.querySelector(`form[action*="complete-timer/{{ $order->id }}"]`).submit();
+                        formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                     }
+
+                    timer.textContent = formattedTime;
+                } else {
+                    timer.textContent = "Time's up!";
                 }
-                
-                // Start the timer immediately
-                updateTimer();
-            })();
-            @endforeach
-        });
+            });
+        }
+
+        // Update timers every second
+        setInterval(updateTimers, 1000);
+        // Initial update
+        updateTimers();
     </script>
 </body>
 </html> 

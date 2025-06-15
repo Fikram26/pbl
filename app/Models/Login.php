@@ -41,6 +41,6 @@ class Login extends Authenticatable
      */
     public function logins()
     {
-        return $this->hasMany(Login::class, 'account_id');
+        return $this->hasMany(LoginHistory::class, 'user_id');
     }
 } 

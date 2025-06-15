@@ -163,6 +163,13 @@
             color: #1e40af;
         }
 
+        .timer-display {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e40af;
+            margin-top: 0.25rem;
+        }
+
         .status-completed {
             background: #dcfce7;
             color: #166534;
@@ -176,6 +183,36 @@
         .status-belum_lunas {
             background: #fef3c7;
             color: #92400e;
+        }
+
+        .order-timer {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #4f46e5;
+            font-weight: 600;
+            background-color: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .order-timer.warning {
+            color: #f59e0b;
+            background-color: #fef3c7;
+            animation: pulse 1s infinite;
+        }
+
+        .order-timer.danger {
+            color: #ef4444;
+            background-color: #fee2e2;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
         .action-buttons {
@@ -280,6 +317,7 @@
                         <th>Jenis Pakaian</th>
                         <th>Bahan</th>
                         <th>Banyak</th>
+                        <th>Timer</th>
                         <th>Status</th>
                         <th>Pembayaran</th>
                         <th>Created At</th>
@@ -293,6 +331,15 @@
                         <td>{{ $order->bahan_pakaian }}</td>
                         <td>{{ $order->banyak }}</td>
                         <td>
+                            @if($order->status === 'sedang dikerjakan' && $order->started_at)
+                                <div class="order-timer" data-started-at="{{ $order->started_at->timestamp }}" data-duration="{{ $order->timer_duration * 60 }}">
+                                    --:--:--
+                                </div>
+                            @else
+                                {{ $order->timer_duration }} menit
+                            @endif
+                        </td>
+                        <td>
                             <span class="status-badge status-{{ strtolower($order->status) }}">
                                 {{ $order->status }}
                             </span>
@@ -302,16 +349,59 @@
                                 {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}
                             </span>
                         </td>
-                        <td>{{ $order->created_at->format('M d, Y H:i') }}</td>
+                        <td>{{ $order->created_at->setTimezone('Asia/Jakarta')->format('d M Y H:i') }}</td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" style="text-align: center;">No orders found</td>
+                        <td colspan="8" style="text-align: center;">No orders found</td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+    <script>
+        function updateOrderTimers() {
+            document.querySelectorAll('.order-timer').forEach(timerElement => {
+                const startedAtTimestamp = parseInt(timerElement.dataset.startedAt);
+                const duration = parseInt(timerElement.dataset.duration);
+
+                if (startedAtTimestamp > 0) {
+                    const nowTimestamp = Math.floor(Date.now() / 1000);
+                    const elapsedSeconds = nowTimestamp - startedAtTimestamp;
+                    const remainingSeconds = duration - elapsedSeconds;
+
+                    if (remainingSeconds <= 0) {
+                        timerElement.textContent = '00:00:00';
+                        timerElement.classList.add('danger');
+                    } else {
+                        // Add warning class when less than 1 minute remaining
+                        if (remainingSeconds <= 60) {
+                            timerElement.classList.add('warning');
+                        } else {
+                            timerElement.classList.remove('warning');
+                        }
+
+                        const hours = Math.floor(remainingSeconds / 3600);
+                        const minutes = Math.floor((remainingSeconds % 3600) / 60);
+                        const seconds = remainingSeconds % 60;
+
+                        let formattedTime;
+                        if (hours > 0) {
+                            formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        } else {
+                            formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        }
+
+                        timerElement.textContent = formattedTime;
+                    }
+                }
+            });
+        }
+
+        // Update timers immediately and then every second
+        updateOrderTimers();
+        setInterval(updateOrderTimers, 1000);
+    </script>
 </body>
-</html>
+</html> 

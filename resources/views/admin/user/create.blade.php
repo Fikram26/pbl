@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create User - The Third Interprenuer</title>
+    <title>Add New User - The Third Interprenuer</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -96,29 +96,31 @@
             padding: 1.5rem;
         }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #374151;
             font-weight: 500;
+            color: #374151;
         }
 
-        .form-input {
+        .form-control {
+            display: block;
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        .form-control:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
         }
 
         .btn {
@@ -131,6 +133,7 @@
             align-items: center;
             gap: 0.5rem;
             text-decoration: none;
+            justify-content: center;
         }
 
         .btn-primary {
@@ -147,16 +150,14 @@
             opacity: 0.9;
         }
 
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
         }
 
         @media (max-width: 768px) {
@@ -192,10 +193,6 @@
                 <i class="fas fa-user"></i>
                 <span>User</span>
             </a>
-            <a href="{{ route('admin.settings') }}" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
             <a href="{{ route('admin.timer') }}" class="nav-item">
                 <i class="fas fa-clock"></i>
                 <span>Timer</span>
@@ -204,91 +201,81 @@
                 <i class="fas fa-info-circle"></i>
                 <span>About</span>
             </a>
-            <form action="{{ route('logout') }}" method="POST" style="margin-top: 2rem;">
-                @csrf
-                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </button>
-            </form>
+            <a href="{{ route('admin.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="top-bar">
-            <h1 class="page-title">Create New User</h1>
-            <div class="user-info">
-                <span>{{ \App\Models\Login::find(session('login_id'))->name }}</span>
-            </div>
+            <h1 class="page-title">
+                <i class="fas fa-plus"></i>
+                Add New User
+            </h1>
+            <form action="{{ route('logout') }}" method="POST" style="margin:0;">
+                @csrf
+                <input type="hidden" name="redirect" value="{{ route('dashboard') }}">
+                <button type="submit" style="background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;">Logout</button>
+            </form>
         </div>
 
         <div class="card">
-            <form action="{{ route('admin.user.store') }}" method="POST">
-                @csrf
-                
-                <div class="form-group">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required>
-                    @error('name')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+            <div class="card-body">
+                <form action="{{ route('admin.user.store') }}" method="POST">
+                    @csrf
 
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required>
-                    @error('email')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" class="form-input" required>
-                    @error('password')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="phone" class="form-label">Nomor Telepon</label>
-                    <input type="tel" id="phone" name="phone" class="form-input" value="{{ old('phone') }}" required>
-                    @error('phone')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="address" class="form-label">Alamat</label>
-                    <textarea id="address" name="address" class="form-input" rows="3" required>{{ old('address') }}</textarea>
-                    @error('address')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" id="password" class="form-control" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="role" class="form-label">Role</label>
-                    <select id="role" name="role" class="form-input" required>
-                        <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                    </select>
-                    @error('role')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" name="phone" id="phone" class="form-control" value="{{ old('phone') }}">
+                    </div>
 
-                <div class="form-actions">
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea name="address" id="address" class="form-control" rows="3">{{ old('address') }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select name="role" id="role" class="form-control" required>
+                            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i>
-                        Create User
+                        Save User
                     </button>
-                    <a href="{{ route('admin.user') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i>
-                        Cancel
-                    </a>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </body>

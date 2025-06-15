@@ -17,6 +17,14 @@ class Order extends Model
         'account_id',
         'status',
         'payment_status',
+        'timer_duration',
+        'started_at'
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'started_at' => 'datetime'
     ];
 
     /**

@@ -401,10 +401,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($loginHistory ?? [] as $login)
+                            @forelse($loginHistory as $login)
                             <tr>
-                                <td>{{ $login->created_at->format('M d, Y') }}</td>
-                                <td>{{ $login->created_at->format('H:i:s') }}</td>
+                                <td>{{ $login->login_at->setTimezone('Asia/Jakarta')->format('M d, Y') }}</td>
+                                <td>{{ $login->login_at->setTimezone('Asia/Jakarta')->format('H:i:s') }}</td>
                                 <td>{{ $login->ip_address ?? 'N/A' }}</td>
                             </tr>
                             @empty

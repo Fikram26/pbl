@@ -354,23 +354,34 @@
                     const remainingSeconds = duration - elapsedSeconds;
 
                     if (remainingSeconds <= 0) {
-                        timerElement.textContent = '00:00';
-                        timerElement.style.color = '#ef4444'; // Red color for expired timer
+                        timerElement.textContent = '00:00:00';
+                        timerElement.classList.add('danger');
                     } else {
-                        const minutes = Math.floor(remainingSeconds / 60);
+                        // Add warning class when less than 1 minute remaining
+                        if (remainingSeconds <= 60) {
+                            timerElement.classList.add('warning');
+                        } else {
+                            timerElement.classList.remove('warning');
+                        }
+
+                        const hours = Math.floor(remainingSeconds / 3600);
+                        const minutes = Math.floor((remainingSeconds % 3600) / 60);
                         const seconds = remainingSeconds % 60;
 
-                        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                        setTimeout(updateTimer, 1000);
+                        let formattedTime;
+                        if (hours > 0) {
+                            formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        } else {
+                            formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        }
+
+                        timerElement.textContent = formattedTime;
                     }
                 }
 
-                // Start the timer if started_at is valid
-                if (startedAtTimestamp > 0) {
-                   updateTimer();
-                } else {
-                    timerElement.textContent = '--:--'; // Display default if not started
-                }
+                // Update timer immediately and then every second
+                updateTimer();
+                setInterval(updateTimer, 1000);
             });
         });
     </script>

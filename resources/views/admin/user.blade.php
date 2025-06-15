@@ -186,10 +186,6 @@
                 <i class="fas fa-user"></i>
                 <span>User</span>
             </a>
-            <a href="{{ route('admin.settings') }}" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
             <a href="{{ route('admin.timer') }}" class="nav-item">
                 <i class="fas fa-clock"></i>
                 <span>Timer</span>
@@ -197,6 +193,10 @@
             <a href="{{ route('admin.about') }}" class="nav-item">
                 <i class="fas fa-info-circle"></i>
                 <span>About</span>
+            </a>
+            <a href="{{ route('admin.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
             </a>
             <form action="{{ route('logout') }}" method="POST" style="margin-top: 2rem;">
                 @csrf
@@ -215,7 +215,12 @@
         </div>
 
         <div class="card">
-            <div style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.25rem; color: #1f2937;">List of Users</h2>
+                <form action="{{ route('admin.user') }}" method="GET" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Search users..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                </form>
                 <a href="{{ route('admin.user.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i>
                     Add New User

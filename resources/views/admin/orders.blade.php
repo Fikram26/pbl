@@ -233,6 +233,23 @@
             background-color: #dcfce7;
             color: #166534;
         }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .timer-display {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1e40af;
+            margin-top: 0.25rem;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
     </style>
 </head>
 <body>
@@ -257,10 +274,6 @@
                 <i class="fas fa-user"></i>
                 <span>User</span>
             </a>
-            <a href="{{ route('admin.settings') }}" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
             <a href="{{ route('admin.timer') }}" class="nav-item">
                 <i class="fas fa-clock"></i>
                 <span>Timer</span>
@@ -268,6 +281,10 @@
             <a href="{{ route('admin.about') }}" class="nav-item">
                 <i class="fas fa-info-circle"></i>
                 <span>About</span>
+            </a>
+            <a href="{{ route('admin.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
             </a>
             <form action="{{ route('logout') }}" method="POST" style="margin-top: 2rem;">
                 @csrf
@@ -292,6 +309,10 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 style="font-size: 1.25rem; color: #1f2937;">List of Orders</h2>
+                <form action="{{ route('admin.orders') }}" method="GET" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Search orders..." value="{{ request('search') }}">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                </form>
                 <a href="{{ route('admin.orders.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i>
                     Add New Order
@@ -337,16 +358,21 @@
                             @endif
                         </td>
                         <td>
-                            <span class="badge bg-{{ $order->status === 'belum selesai' ? 'warning' : ($order->status === 'sedang dikerjakan' ? 'info' : 'success') }}">
-                                {{ ucfirst($order->status) }}
+                            <span class="status-badge status-{{ strtolower($order->status) }}">
+                                {{ $order->status }}
                             </span>
+                            @if(strtolower($order->status) === 'sedang dikerjakan')
+                                <div class="timer-display" id="timer-{{ $order->id }}" data-start-time="{{ $order->updated_at->timestamp }}">
+                                    Calculating...
+                                </div>
+                            @endif
                         </td>
                         <td>
                             <span class="badge bg-{{ $order->payment_status === 'belum_lunas' ? 'warning' : 'success' }}">
                                 {{ ucfirst(str_replace('_', ' ', $order->payment_status)) }}
                             </span>
                         </td>
-                        <td>{{ $order->created_at->format('d M Y H:i') }}</td>
+                        <td>{{ $order->created_at->setTimezone('Asia/Jakarta')->format('d M Y H:i') }}</td>
                         <td>
                             <div class="action-buttons">
                                 @if($order->status === 'belum selesai')
@@ -493,6 +519,31 @@
         // Update timers immediately and then every second
         updateOrderTimers();
         setInterval(updateOrderTimers, 1000);
+
+        function updateTimers() {
+            const timers = document.querySelectorAll('[id^="timer-"]');
+            const now = Math.floor(Date.now() / 1000);
+
+            timers.forEach(timer => {
+                const startTime = parseInt(timer.dataset.startTime);
+                const duration = parseInt(timer.dataset.duration || 300); // Use actual duration or fallback to 5 minutes
+                const elapsedSeconds = now - startTime;
+                const remainingSeconds = duration - elapsedSeconds;
+
+                if (remainingSeconds > 0) {
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    timer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    timer.textContent = "Time's up!";
+                }
+            });
+        }
+
+        // Update timers every second
+        setInterval(updateTimers, 1000);
+        // Initial update
+        updateTimers();
     </script>
 </body>
 </html> 

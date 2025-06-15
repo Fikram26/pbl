@@ -16,6 +16,18 @@ class OrderController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('jenis_pakaian', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('bahan_pakaian', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('status', 'like', '%' . $searchTerm . '%')
+                  ->orWhereHas('account', function ($q2) use ($searchTerm) {
+                      $q2->where('email', 'like', '%' . $searchTerm . '%');
+                  });
+            });
+        }
+
         $orders = $query->get();
 
         return view('admin.orders', compact('orders'));
