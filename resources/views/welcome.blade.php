@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Jemuran Indor berbasis IOT dan Sensor</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -208,6 +208,7 @@
         Di era digital ini, kebutuhan akan kemudahan dan efisiensi menjadi prioritas.<br>
         Jemuran indoor berbasis IoT hadir sebagai solusi modern untuk Anda yang ingin mengeringkan pakaian dengan praktis, higienis, dan hemat energi.
     </div>
+
     <script>
         // Jam realtime
         function updateClock(){
