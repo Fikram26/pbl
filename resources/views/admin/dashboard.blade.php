@@ -480,7 +480,7 @@
                             @foreach(\App\Models\Order::with('account')->latest()->take(5)->get() as $order)
                             <tr>
                                 <td>#{{ $order->id }}</td>
-                                <td>{{ $order->account->name }}</td>
+                                <td>{{ $order->account->name ?? 'N/A' }}</td>
                                 <td>{{ $order->banyak }} items</td>
                                 <td>{{ $order->jenis_pakaian }}</td>
                                 <td>

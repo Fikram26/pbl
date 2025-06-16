@@ -224,7 +224,7 @@
             </h1>
             <form action="{{ route('logout') }}" method="POST" style="margin:0;">
                 @csrf
-                <input type="hidden" name="redirect" value="{{ route('dashboard') }}">
+                <input type="hidden" name="redirect" value="{{ route('admin.dashboard') }}">
                 <button type="submit" style="background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;">Logout</button>
             </form>
         </div>

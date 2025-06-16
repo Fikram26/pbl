@@ -219,6 +219,10 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        setTimeout(function() {
+            window.location.reload();
+        }, 30000);
     </script>
 </body>
 </html>

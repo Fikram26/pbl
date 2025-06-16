@@ -154,6 +154,10 @@
             border: 1px solid transparent;
             border-radius: 0.25rem;
         }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -252,8 +256,8 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="waktu_pengerjaan" class="form-label">Waktu Pengerjaan</label>
-                        <input type="number" name="waktu_pengerjaan" id="waktu_pengerjaan" class="form-control" value="{{ old('waktu_pengerjaan') }}" min="1" required>
+                        <label for="timer_duration" class="form-label">Waktu Pengerjaan</label>
+                        <input type="number" name="timer_duration" id="timer_duration" class="form-control" value="{{ old('timer_duration', 60) }}" required min="1">
                         <small class="form-text text-muted">Waktu yang dibutuhkan untuk menyelesaikan order (dalam menit)</small>
                     </div>
 

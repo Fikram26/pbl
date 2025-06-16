@@ -20,15 +20,12 @@ use Illuminate\Support\Facades\Hash;
 */
 
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::get('/welcome', [DashboardController::class, 'welcome'])->name('welcome');
 
 Route::get('/about', function () {
     return view('about');
 });
 
 // Sensor Dashboard Routes
-Route::get('/sensor', [SensorDataController::class, 'index'])->name('sensor.dashboard');
 Route::post('/sensor/data', [SensorDataController::class, 'store'])->name('sensor.store');
 
 // Login Routes
