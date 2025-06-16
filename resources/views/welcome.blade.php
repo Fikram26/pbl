@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jemuran Indor berbasis IOT dan Sensor</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -146,6 +146,7 @@
                 padding: 8px 12px;
             }
         }
+        /* Style for data-box (from previous code, might not be needed but kept for completeness) */
         .data-box { border: 2px solid #4CAF50; padding: 20px; width: 300px; margin: auto; border-radius: 10px; }
         h2 { color: #333; text-align: center; }
         p { font-size: 18px; }
@@ -194,12 +195,9 @@
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/61/61112.png" alt="Waktu">
                 <div class="label">Waktu</div>
-                <div class="value" id="clock">
-                    @if($data)
-                        {{ \Carbon\Carbon::parse($data->created_at)->format('H:i:s') }}
-                    @else
-                        -
-                    @endif
+                <div class="value" id="time-value">
+                    {{-- The time will be updated by JavaScript below for real-time display --}}
+                    -
                 </div>
             </div>
         </div>
@@ -208,42 +206,48 @@
         Di era digital ini, kebutuhan akan kemudahan dan efisiensi menjadi prioritas.<br>
         Jemuran indoor berbasis IoT hadir sebagai solusi modern untuk Anda yang ingin mengeringkan pakaian dengan praktis, higienis, dan hemat energi.
     </div>
-
     <script>
-        // Jam realtime
-        function updateClock(){
+        // Update local clock every second for real-time display
+        function updateRealtimeClock() {
             const now = new Date();
-            let h = now.getHours().toString().padStart(2,'0');
-            let m = now.getMinutes().toString().padStart(2,'0');
-            let s = now.getSeconds().toString().padStart(2,'0');
-            document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+            let h = now.getHours().toString().padStart(2, '0');
+            let m = now.getMinutes().toString().padStart(2, '0');
+            let s = now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('time-value').textContent = `${h}:${m}:${s}`;
         }
-        setInterval(updateClock,1000);
-        updateClock();
+
+        // Run the function immediately and then every second
+        updateRealtimeClock();
+        setInterval(updateRealtimeClock, 1000);
 
         // Mengambil data sensor dari API setiap 1 detik
         async function fetchData(){
             try {
-                const response = await fetch('/api/sensors'); // sesuai route yang Anda bikin
+                // Fetch data dari API Laravel yang baru kita buat
+                const response = await fetch('/api/sensors');
                 const data = await response.json();
 
                 if (data.suhu !== null && data.humidity !== null) {
                     document.getElementById('suhu-value').textContent = data.suhu + "° C";
                     document.getElementById('humidity-value').textContent = data.humidity + "%";
+                    // 'time-value' is now updated by updateRealtimeClock()
                 } else {
                     document.getElementById('suhu-value').textContent = '-';
                     document.getElementById('humidity-value').textContent = '-';
+                    // 'time-value' is now updated by updateRealtimeClock()
                 }
 
             } catch (error) {
-                console.error(error);
+                console.error("Error fetching sensor data:", error);
                 document.getElementById('suhu-value').textContent = 'Error';
                 document.getElementById('humidity-value').textContent = 'Error';
-                document.getElementById('clock').textContent = 'Error';
+                document.getElementById('time-value').textContent = 'Error'; // Show error for time too if API fails
             }
         }
 
+        // Jalankan fetchData setiap 1 detik
         setInterval(fetchData, 1000);
+        // Panggil fetchData segera setelah halaman dimuat untuk menampilkan data awal
         fetchData();
 
     </script>
