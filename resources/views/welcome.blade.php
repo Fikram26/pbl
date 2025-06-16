@@ -172,7 +172,7 @@
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/1684/1684375.png" alt="Suhu">
                 <div class="label">Suhu</div>
-                <div class="value">
+                <div class="value" id="suhu-value">
                     @if($data)
                         {{ number_format($data->suhu, 2) }}&deg; C
                     @else
@@ -183,7 +183,7 @@
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/728/728093.png" alt="Kelembaban">
                 <div class="label">Kelembaban</div>
-                <div class="value">
+                <div class="value" id="humidity-value">
                     @if($data)
                         {{ number_format($data->humidity, 2) }}%
                     @else
@@ -210,19 +210,41 @@
     </div>
     <script>
         // Jam realtime
-        function updateClock() {
+        function updateClock(){
             const now = new Date();
-            let h = now.getHours().toString().padStart(2, '0');
-            let m = now.getMinutes().toString().padStart(2, '0');
-            let s = now.getSeconds().toString().padStart(2, '0');
+            let h = now.getHours().toString().padStart(2,'0');
+            let m = now.getMinutes().toString().padStart(2,'0');
+            let s = now.getSeconds().toString().padStart(2,'0');
             document.getElementById('clock').textContent = `${h}:${m}:${s}`;
         }
-        setInterval(updateClock, 1000);
+        setInterval(updateClock,1000);
         updateClock();
 
-        setTimeout(function() {
-            window.location.reload();
-        }, 30000);
+        // Mengambil data sensor dari API setiap 1 detik
+        async function fetchData(){
+            try {
+                const response = await fetch('/api/sensors'); // sesuai route yang Anda bikin
+                const data = await response.json();
+
+                if (data.suhu !== null && data.humidity !== null) {
+                    document.getElementById('suhu-value').textContent = data.suhu + "° C";
+                    document.getElementById('humidity-value').textContent = data.humidity + "%";
+                } else {
+                    document.getElementById('suhu-value').textContent = '-';
+                    document.getElementById('humidity-value').textContent = '-';
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('suhu-value').textContent = 'Error';
+                document.getElementById('humidity-value').textContent = 'Error';
+                document.getElementById('clock').textContent = 'Error';
+            }
+        }
+
+        setInterval(fetchData, 1000);
+        fetchData();
+
     </script>
 </body>
 </html>

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 */
 
 Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
+Route::get('/api/sensors', [SensorDataController::class, 'getLatestData']);
 
 Route::get('/about', function () {
     return view('about');

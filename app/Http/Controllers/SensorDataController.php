@@ -23,4 +23,15 @@ class SensorDataController extends Controller
         SensorData::create($request->all());
         return response()->json(['message' => 'Data berhasil disimpan']);
     }
+
+    public function getLatestData()
+    {
+        $data = SensorData::latest()->first();
+
+        return response()->json([
+            'suhu'     => $data ? number_format($data->suhu, 2) : null,
+            'humidity' => $data ? number_format($data->humidity, 2) : null,
+            'created_at' => $data ? $data->created_at->format('H:i:s') : null,
+        ]);
+    }
 } 
