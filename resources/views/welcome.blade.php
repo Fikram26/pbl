@@ -146,6 +146,9 @@
                 padding: 8px 12px;
             }
         }
+        .data-box { border: 2px solid #4CAF50; padding: 20px; width: 300px; margin: auto; border-radius: 10px; }
+        h2 { color: #333; text-align: center; }
+        p { font-size: 18px; }
     </style>
 </head>
 <body>
@@ -169,17 +172,35 @@
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/1684/1684375.png" alt="Suhu">
                 <div class="label">Suhu</div>
-                <div class="value">27,90&deg; C</div>
+                <div class="value">
+                    @if($data)
+                        {{ number_format($data->suhu, 2) }}&deg; C
+                    @else
+                        -
+                    @endif
+                </div>
             </div>
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/728/728093.png" alt="Kelembaban">
                 <div class="label">Kelembaban</div>
-                <div class="value">55,30%</div>
+                <div class="value">
+                    @if($data)
+                        {{ number_format($data->humidity, 2) }}%
+                    @else
+                        -
+                    @endif
+                </div>
             </div>
             <div class="stat-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/61/61112.png" alt="Waktu">
                 <div class="label">Waktu</div>
-                <div class="value" id="clock">12:30:45</div>
+                <div class="value" id="clock">
+                    @if($data)
+                        {{ \Carbon\Carbon::parse($data->created_at)->format('H:i:s') }}
+                    @else
+                        -
+                    @endif
+                </div>
             </div>
         </div>
     </div>

@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SensorDataController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Hash;
 
 /*
@@ -17,18 +19,17 @@ use Illuminate\Support\Facades\Hash;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [DashboardController::class, 'welcome'])->name('welcome');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/welcome', [DashboardController::class, 'welcome'])->name('welcome');
 
 Route::get('/about', function () {
     return view('about');
 });
 
-// Redirect /dashboard to /admin/dashboard
-Route::get('/dashboard', function () {
-    return redirect()->route('admin.dashboard');
-})->name('dashboard');
+// Sensor Dashboard Routes
+Route::get('/sensor', [SensorDataController::class, 'index'])->name('sensor.dashboard');
+Route::post('/sensor/data', [SensorDataController::class, 'store'])->name('sensor.store');
 
 // Login Routes
 Route::middleware(['web'])->group(function () {
