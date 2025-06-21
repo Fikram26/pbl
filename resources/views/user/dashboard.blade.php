@@ -262,43 +262,19 @@
         <!-- Info Cards -->
         <div class="cards-grid">
             <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-tshirt"></i>
-                </div>
-                <div class="card-value">{{ $totalOrders ?? 0 }}</div>
+                <div class="card-icon"><i class="fas fa-box-open"></i></div>
+                <div class="card-value">{{ $totalOrders }}</div>
                 <div class="card-label">Total Orders</div>
             </div>
-
             <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="card-value">{{ $pendingOrders ?? 0 }}</div>
-                <div class="card-label">Pending Orders</div>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="card-value">{{ $completedOrders ?? 0 }}</div>
+                <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="card-value">{{ $completedOrders }}</div>
                 <div class="card-label">Completed Orders</div>
             </div>
-
             <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-thermometer-half"></i>
-                </div>
-                <div class="card-value">--°C</div>
-                <div class="card-label">Suhu</div>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">
-                    <i class="fas fa-tint"></i>
-                </div>
-                <div class="card-value">--%</div>
-                <div class="card-label">Kelembaban</div>
+                <div class="card-icon"><i class="fas fa-spinner"></i></div>
+                <div class="card-value">{{ $pendingOrders }}</div>
+                <div class="card-label">Pending Orders</div>
             </div>
         </div>
 

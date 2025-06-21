@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jemuran Indor berbasis IOT dan Sensor</title>
+    <title>Profan - Lemari Pengering Cerdas</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -65,6 +65,50 @@
             border-radius: 6px;
             font-style: italic;
             text-align: center;
+        }
+        .features-section {
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        .features-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .features-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 30px;
+            width: 300px;
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-card img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #4636db;
+        }
+        .feature-card p {
+            font-size: 1rem;
+            color: #555;
+            line-height: 1.6;
         }
         .desc {
             text-align: center;
@@ -165,46 +209,30 @@
     </div>
     <div class="hero">
         <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80" alt="jemuran" class="hero-img">
-        <div class="hero-title"><b><i>Jemuran Indor berbasis IOT dan sensor</i></b></div>
+        <div class="hero-title"><b><i>Lemari Pengering Pakaian Cerdas</i></b></div>
     </div>
-    <div class="stats-section">
-        <div class="stats-title">Jemuran indor berbasis IOT dan sensor</div>
-        <div class="stats-cards">
-            <div class="stat-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/1684/1684375.png" alt="Suhu">
-                <div class="label">Suhu</div>
-                <div class="value" id="suhu-value">
-                    @if($data)
-                        {{ number_format($data->suhu, 2) }}&deg; C
-                    @else
-                        -
-                    @endif
-                </div>
+    <div class="features-section">
+        <h2 class="features-title">Fitur Unggulan</h2>
+        <div class="features-container">
+            <div class="feature-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2900/2900228.png" alt="Sensor Cerdas">
+                <h3>Sensor Cerdas</h3>
+                <p>Sistem sensor terintegrasi memantau suhu dan kelembapan untuk hasil pengeringan yang sempurna dan efisien.</p>
             </div>
-            <div class="stat-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/728/728093.png" alt="Kelembaban">
-                <div class="label">Kelembaban</div>
-                <div class="value" id="humidity-value">
-                    @if($data)
-                        {{ number_format($data->humidity, 2) }}%
-                    @else
-                        -
-                    @endif
-                </div>
+            <div class="feature-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/9408/9408996.png" alt="Kontrol Jarak Jauh">
+                <h3>Kontrol Jarak Jauh</h3>
+                <p>Kendalikan dan pantau lemari pengering Anda dari mana saja menggunakan aplikasi smartphone yang mudah digunakan.</p>
             </div>
-            <div class="stat-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/61/61112.png" alt="Waktu">
-                <div class="label">Waktu</div>
-                <div class="value" id="time-value">
-                    {{-- The time will be updated by JavaScript below for real-time display --}}
-                    -
-                </div>
+            <div class="feature-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2143/2143176.png" alt="Hemat Energi">
+                <h3>Hemat Energi</h3>
+                <p>Didesain untuk efisiensi, mengurangi konsumsi energi dan menghemat biaya listrik Anda.</p>
             </div>
         </div>
     </div>
     <div class="desc">
-        Di era digital ini, kebutuhan akan kemudahan dan efisiensi menjadi prioritas.<br>
-        Jemuran indoor berbasis IoT hadir sebagai solusi modern untuk Anda yang ingin mengeringkan pakaian dengan praktis, higienis, dan hemat energi.
+        Selamat datang di masa depan mencuci! Project Profan kami adalah sistem lemari pengering pakaian cerdas berbasis IoT yang dirancang untuk merevolusi cara Anda mengeringkan pakaian. Lupakan kekhawatiran tentang cuaca yang tidak dapat diprediksi atau pakaian yang lembab. Dengan teknologi sensor canggih, sistem kami secara cerdas memantau suhu dan kelembaban untuk memastikan kondisi pengeringan yang optimal, sementara Anda dapat memantau semuanya dari kenyamanan rumah Anda.
     </div>
     <script>
         // Update local clock every second for real-time display

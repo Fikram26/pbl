@@ -317,7 +317,6 @@
                         <th>Jenis Pakaian</th>
                         <th>Bahan</th>
                         <th>Banyak</th>
-                        <th>Timer</th>
                         <th>Status</th>
                         <th>Pembayaran</th>
                         <th>Created At</th>
@@ -331,16 +330,7 @@
                         <td>{{ $order->bahan_pakaian }}</td>
                         <td>{{ $order->banyak }}</td>
                         <td>
-                            @if($order->status === 'sedang dikerjakan' && $order->started_at)
-                                <div class="order-timer" data-started-at="{{ $order->started_at->timestamp }}" data-duration="{{ $order->timer_duration * 60 }}">
-                                    --:--:--
-                                </div>
-                            @else
-                                {{ $order->timer_duration }} menit
-                            @endif
-                        </td>
-                        <td>
-                            <span class="status-badge status-{{ strtolower($order->status) }}">
+                            <span class="status-badge {{ 'status-' . strtolower(str_replace(' ', '_', $order->status)) }}">
                                 {{ $order->status }}
                             </span>
                         </td>

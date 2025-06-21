@@ -214,7 +214,7 @@
             </h1>
             <form action="{{ route('logout') }}" method="POST" style="margin:0;">
                 @csrf
-                <input type="hidden" name="redirect" value="{{ route('dashboard') }}">
+                <input type="hidden" name="redirect" value="{{ route('admin.dashboard') }}">
                 <button type="submit" style="background:none;border:none;color:#fff;font-size:1rem;cursor:pointer;">Logout</button>
             </form>
         </div>
@@ -251,25 +251,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="timer_duration" class="form-label">Durasi Timer (menit)</label>
-                        <input type="number" name="timer_duration" id="timer_duration" class="form-control" value="{{ old('timer_duration', $order->timer_duration) }}" min="1" required>
-                        <small class="form-text text-muted">Waktu yang dibutuhkan untuk menyelesaikan order (dalam menit)</small>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="payment_status" class="form-label">Status Pembayaran</label>
                         <select name="payment_status" id="payment_status" class="form-control" required>
-                            <option value="belum_lunas" {{ old('payment_status', $order->payment_status) == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                            <option value="belum lunas" {{ old('payment_status', $order->payment_status) == 'belum lunas' ? 'selected' : '' }}>Belum Lunas</option>
                             <option value="lunas" {{ old('payment_status', $order->payment_status) == 'lunas' ? 'selected' : '' }}>Lunas</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-control" required>
-                            <option value="belum selesai" {{ old('status', $order->status) == 'belum selesai' ? 'selected' : '' }}>Belum Selesai</option>
-                            <option value="sedang dikerjakan" {{ old('status', $order->status) == 'sedang dikerjakan' ? 'selected' : '' }}>Sedang Dikerjakan</option>
-                            <option value="selesai" {{ old('status', $order->status) == 'selesai' ? 'selected' : '' }}>Selesai</option>
                         </select>
                     </div>
 

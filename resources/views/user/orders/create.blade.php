@@ -237,28 +237,9 @@
                     @enderror
                 </div>
 
-                <div class="form-group">
-                    <label for="timer_duration" class="form-label">Timer Duration (minutes)</label>
-                    <input type="number" id="timer_duration" name="timer_duration" class="form-input" value="{{ old('timer_duration', 60) }}" required min="1">
-                    @error('timer_duration')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="form-group">
-                    <label for="payment_status" class="form-label">Status Pembayaran</label>
-                    <select name="payment_status" id="payment_status" class="form-input" required>
-                        <option value="belum_lunas" {{ old('payment_status') == 'belum_lunas' ? 'selected' : '' }}>Belum Lunas</option>
-                        <option value="lunas" {{ old('payment_status') == 'lunas' ? 'selected' : '' }}>Lunas</option>
-                    </select>
-                    @error('payment_status')
-                        <p class="error-message">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <button type="submit" class="form-button">
                     <i class="fas fa-plus"></i>
-                    Create Order
+                    <span>Create Order</span>
                 </button>
             </form>
         </div>

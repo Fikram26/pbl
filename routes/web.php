@@ -44,7 +44,26 @@ Route::middleware(['web'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['web', \App\Http\Middleware\AdminMiddleware::class])->group(function () {
     // Dashboard
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        $user = \App\Models\Login::find(session('login_id'));
+        $latestData = \App\Models\SensorData::latest()->first();
+        $totalUsers = \App\Models\Login::count();
+        $totalOrders = \App\Models\Order::count();
+        $completedOrdersCount = \App\Models\Order::where('status', 'selesai')->count();
+        $pendingOrders = \App\Models\Order::whereIn('status', ['pending', 'belum selesai'])->count();
+        $processingOrders = \App\Models\Order::where('status', 'sedang dikerjakan')->count();
+        $cancelledOrders = \App\Models\Order::where('status', 'dibatalkan')->count();
+        $newUsersToday = \App\Models\Login::whereDate('created_at', today())->count();
+        $totalAdmins = \App\Models\Login::where('role', 'admin')->count();
+        $totalCustomers = \App\Models\Login::where('role', 'user')->count();
+        $recentOrders = \App\Models\Order::with('account')->latest()->take(5)->get();
+        $recentCustomers = \App\Models\Login::where('role', 'user')->latest()->take(5)->get();
+
+        return view('admin.dashboard', compact(
+            'user', 'latestData', 'totalUsers', 'totalOrders', 'completedOrdersCount',
+            'pendingOrders', 'processingOrders', 'cancelledOrders',
+            'newUsersToday', 'totalAdmins', 'totalCustomers',
+            'recentOrders', 'recentCustomers'
+        ));
     })->name('dashboard');
 
     // About
@@ -231,10 +250,10 @@ Route::prefix('user')->name('user.')->group(function () {
         $user = \App\Models\Login::find(session('login_id'));
         $totalOrders = \App\Models\Order::where('account_id', session('login_id'))->count();
         $pendingOrders = \App\Models\Order::where('account_id', session('login_id'))
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'belum selesai'])
             ->count();
         $completedOrders = \App\Models\Order::where('account_id', session('login_id'))
-            ->where('status', 'completed')
+            ->where('status', 'selesai')
             ->count();
         $recentOrders = \App\Models\Order::where('account_id', session('login_id'))
             ->latest()
@@ -258,28 +277,31 @@ Route::prefix('user')->name('user.')->group(function () {
         return view('user.orders.create', compact('user'));
     })->name('orders.create');
 
-    Route::post('/orders', function () {
-        $validated = request()->validate([
+    Route::post('/orders', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
             'jenis_pakaian' => 'required|string',
             'bahan_pakaian' => 'required|string',
-            'banyak' => 'required|integer|min:1',
-            'timer_duration' => 'required|integer|min:1',
-            'payment_status' => 'required|in:belum_lunas,lunas',
+            'banyak' => 'required|integer'
         ]);
-
-        $validated['account_id'] = session('login_id');
-        $validated['status'] = 'belum selesai';
-
-        \App\Models\Order::create($validated);
-
-        return redirect()->route('user.orders')
-            ->with('success', 'Order created successfully');
+        
+        $order = new \App\Models\Order();
+        $order->account_id = session('login_id');
+        $order->jenis_pakaian = $validated['jenis_pakaian'];
+        $order->bahan_pakaian = $validated['bahan_pakaian'];
+        $order->banyak = $validated['banyak'];
+        $order->timer_duration = 0; // Set default value
+        $order->payment_status = 'Belum lunas'; // Set default value
+        $order->status = 'pending';
+        $order->save();
+        
+        return redirect()->route('user.orders')->with('success', 'Order created successfully!');
     })->name('orders.store');
 
     Route::get('/orders/{order}/edit', function ($order) {
+        $user = \App\Models\Login::find(session('login_id'));
         $order = \App\Models\Order::where('account_id', session('login_id'))
             ->findOrFail($order);
-        return view('user.orders.edit', compact('order'));
+        return view('user.orders.edit', compact('user', 'order'));
     })->name('orders.edit');
 
     Route::put('/orders/{order}', function ($order) {

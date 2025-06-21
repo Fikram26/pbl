@@ -333,7 +333,6 @@
                         <th>Jenis Pakaian</th>
                         <th>Bahan Pakaian</th>
                         <th>Jumlah</th>
-                        <th>Timer</th>
                         <th>Status</th>
                         <th>Pembayaran</th>
                         <th>Tanggal Order</th>
@@ -348,15 +347,6 @@
                         <td>{{ $order->jenis_pakaian }}</td>
                         <td>{{ $order->bahan_pakaian }}</td>
                         <td>{{ $order->banyak }}</td>
-                        <td>
-                            @if($order->status === 'sedang dikerjakan' && $order->started_at)
-                                <div class="order-timer" data-started-at="{{ $order->started_at->timestamp }}" data-duration="{{ $order->timer_duration * 60 }}">
-                                    --:--:--
-                                </div>
-                            @else
-                                {{ $order->timer_duration }} menit
-                            @endif
-                        </td>
                         <td>
                             <span class="status-badge status-{{ strtolower($order->status) }}">
                                 {{ $order->status }}
@@ -376,13 +366,9 @@
                         <td>
                             <div class="action-buttons">
                                 @if($order->status === 'belum selesai')
-                                <form action="{{ route('admin.orders.launch', $order->id) }}" method="POST" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-play"></i>
-                                        Launch
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-info launch-button" data-order-id="{{ $order->id }}">
+                                    <i class="fas fa-play"></i> Launch
+                                </button>
                                 @endif
                                 <a href="{{ route('admin.orders.edit', $order->id) }}" class="btn btn-primary">
                                     <i class="fas fa-edit"></i>
@@ -417,6 +403,22 @@
             </table>
         </div>
 
+    </div>
+
+    <!-- Timer Modal -->
+    <div id="timerModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width:400px; border-radius:10px;">
+            <span class="close" style="color:#aaa; float:right; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+            <h3 style="margin-bottom:20px;">Set Timer Duration</h3>
+            <form id="timerForm" method="POST">
+                @csrf
+                <div style="margin-bottom:15px;">
+                    <label for="timer_duration" style="display:block; margin-bottom:5px;">Duration (minutes):</label>
+                    <input type="number" id="timer_duration" name="timer_duration" required min="1" style="width:100%; padding:8px; border-radius:5px; border:1px solid #ccc;">
+                </div>
+                <button type="submit" class="btn btn-primary">Start Timer</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -530,6 +532,30 @@
         // Update timers immediately and then every second
         updateOrderTimers();
         setInterval(updateOrderTimers, 1000);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var modal = document.getElementById('timerModal');
+            var form = document.getElementById('timerForm');
+            var closeBtn = document.querySelector('.close');
+
+            document.querySelectorAll('.launch-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    var orderId = this.dataset.orderId;
+                    form.action = '/admin/orders/' + orderId + '/launch';
+                    modal.style.display = 'block';
+                });
+            });
+
+            closeBtn.onclick = function() {
+                modal.style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        });
     </script>
 </body>
 </html> 

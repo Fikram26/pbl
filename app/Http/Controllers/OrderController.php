@@ -75,9 +75,7 @@ class OrderController extends Controller
             'jenis_pakaian' => 'required|string|max:255',
             'bahan_pakaian' => 'required|string|max:255',
             'banyak' => 'required|integer|min:1',
-            'timer_duration' => 'required|integer|min:1',
-            'status' => 'required|in:belum selesai,sedang dikerjakan,selesai',
-            'payment_status' => 'required|in:belum_lunas,lunas',
+            'payment_status' => 'required|in:belum lunas,lunas',
         ]);
         $order->update($request->all());
         return redirect()->route('admin.orders')->with('success', 'Order berhasil diperbarui!');
@@ -101,12 +99,16 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function launch(Order $order)
+    public function launch(Request $request, Order $order)
     {
+        $request->validate([
+            'timer_duration' => 'required|integer|min:1',
+        ]);
+
         $order->update([
             'status' => 'sedang dikerjakan',
             'started_at' => now(),
-            'timer_duration' => $order->timer_duration ?? 60,
+            'timer_duration' => $request->timer_duration,
         ]);
         return redirect()->route('admin.timer')->with('success', 'Order launched successfully!');
     }
